@@ -1,6 +1,7 @@
 import { api } from './api';
 import { Note } from '@/types/note';
 import { User } from '@/lib/types/user';
+import { QueryClient } from "@tanstack/react-query";
 
 export type AuthRequest = {
     email: string;
@@ -77,4 +78,11 @@ export const fetchNotes = async (
     return data;
   };
 
-  
+  export const getQueryClient = () =>
+    new QueryClient({
+      defaultOptions: {
+        queries: {
+          staleTime: 60 * 1000, 
+        },
+      },
+    });
