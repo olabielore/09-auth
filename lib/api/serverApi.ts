@@ -1,7 +1,7 @@
 
 import { cookies } from 'next/headers';
 import { api } from './api';
-import { User } from '@/lib/types/user';
+import { User } from '@/types/user';
 import { Note } from '@/types/note';
 
 const getCookieHeader = () => {

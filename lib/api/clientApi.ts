@@ -1,6 +1,6 @@
 import { api } from './api';
 import { Note } from '@/types/note';
-import { User } from '@/lib/types/user';
+import { User } from '@/types/user';
 import { QueryClient } from "@tanstack/react-query";
 
 export type AuthRequest = {

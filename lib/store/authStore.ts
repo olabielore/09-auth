@@ -1,6 +1,6 @@
 
 import { create } from 'zustand';
-import { User } from '@/lib/types/user';
+import { User } from '@/types/user';
 
 type AuthStore = {
   isAuthenticated: boolean;
