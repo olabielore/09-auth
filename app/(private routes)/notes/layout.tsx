@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import SidebarNotes from "@/app/notes/filter/@sidebar/SidebarNotes/SidebarNotes";
+import SidebarNotes from "@/app/(private routes)/notes/filter/@sidebar/SidebarNotes/SidebarNotes";
 import css from "./LayoutNotes.module.css";
 
 interface LayoutNotesProps {
