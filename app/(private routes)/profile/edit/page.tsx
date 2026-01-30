@@ -4,25 +4,32 @@
 import { useState, useEffect } from 'react'
 import { updateMe, getMe } from '@/lib/api/clientApi';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { useAuthStore } from '@/lib/store/authStore';
 import css from "./EditProfilePage.module.css"
 
 const EditProfile = () => {
   const router = useRouter();
-  const [userName, setUserName] = useState('');
+  const setUser = useAuthStore((state) => state.setUser);
+  const [username, setUsername] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
   const [email, setEmail] = useState('');
 
-    useEffect(() => {
-        getMe().then((user) => {
-          setUserName(user.userName ?? '');
-          setPhotoUrl(user.photoUrl ?? '');
-          setEmail(user.email);
-        });
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await getMe();
+        setUsername(user.username ?? '');
+        setPhotoUrl(user.avatar ?? '');
+        setEmail(user.email);
+      };
+      fetchUser();
       }, []);
 
   const handleSubmit = async (event: React.ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await updateMe({ userName, photoUrl });
+    const updatedUser = await updateMe({ username });
+    setUser(updatedUser);
     router.push('/profile');
   };
 
@@ -31,7 +38,8 @@ const EditProfile = () => {
         <div className={css.profileCard}>
             <h1 className={css.formTitle}>Edit Profile</h1>
 
-            <img src={photoUrl || '/avatar-placeholder.png'}
+            <Image
+            src={photoUrl || '/avatar-placeholder.png'}
             alt="User Avatar"
             width={120}
             height={120}
@@ -44,8 +52,8 @@ const EditProfile = () => {
                 <input id="username"
                   type="text"
                   className={css.input}
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
             </div>
 

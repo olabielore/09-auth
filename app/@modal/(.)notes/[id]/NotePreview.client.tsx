@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { fetchNoteById } from "@/lib/api/clientApi";
-
+import { useRouter } from "next/navigation";
 import css from "./NotePreview.module.css";
 
 type NotePreviewProps = {
@@ -10,12 +10,17 @@ type NotePreviewProps = {
 };
 
 export default function NotePreview({ id }: NotePreviewProps) {
+  const router = useRouter();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["note", id],
     queryFn: () => fetchNoteById(id),
     refetchOnMount: false,
   });
+
+  const handleClose = () => {
+    router.back(); 
+  };
 
   if (isLoading) {
     return (
@@ -34,10 +39,15 @@ export default function NotePreview({ id }: NotePreviewProps) {
   }
 
   return (
-      <div>
+    <div>
+      <div className={css.modalContent}>
+        <button onClick={handleClose} className={css.closeButton}>
+          ×
+        </button>
         <h2 className={css.title}>{data.title}</h2>
         <p className={css.content}>{data.content}</p>
         <span className={css.tag}>{data.tag}</span>
       </div>
+    </div>
   );
 }

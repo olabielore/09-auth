@@ -1,7 +1,6 @@
 import { api } from './api';
 import { Note } from '@/types/note';
 import { User } from '@/types/user';
-import { QueryClient } from "@tanstack/react-query";
 
 export type AuthRequest = {
     email: string;
@@ -9,8 +8,7 @@ export type AuthRequest = {
 };
   
 export type UpdateUserRequest = {
-  userName?: string;
-  photoUrl?: string;
+  username?: string;
 };
   
 export const register = async (data: AuthRequest): Promise<User> => {
@@ -37,8 +35,8 @@ const { data } = await api.get<User>('/users/me');
 return data;
 };
 
-export const updateMe = async (userName: UpdateUserRequest): Promise<User> => {
-const { data } = await api.patch<User>('/users/me', { userName });
+export const updateMe = async({ username: string }: UpdateUserRequest): Promise<User> => {
+const { data } = await api.patch<User>('/users/me', { username: string });
 return data;
 };
 
@@ -77,12 +75,3 @@ export const fetchNotes = async (
     const { data } = await api.delete<Note>(`/notes/${id}`);
     return data;
   };
-
-  export const getQueryClient = () =>
-    new QueryClient({
-      defaultOptions: {
-        queries: {
-          staleTime: 60 * 1000, 
-        },
-      },
-    });

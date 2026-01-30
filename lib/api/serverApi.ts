@@ -3,24 +3,25 @@ import { cookies } from 'next/headers';
 import { api } from './api';
 import { User } from '@/types/user';
 import { Note } from '@/types/note';
+import type { AxiosResponse } from 'axios';
 
 const getCookieHeader = () => {
   const cookieStore = cookies();
   return cookieStore.toString();
 };
 
-export const checkSession = async () => {
-  const { data } = await api.get('/auth/session', {
+export const checkSession = async (): Promise<AxiosResponse> => {
+  const response = await api.get('/auth/session', {
     headers: {
       Cookie: getCookieHeader(),
     },
   });
- 
-  return data;
+
+  return response;
 };
 
 export const getMe = async (): Promise<User> => {
-    const { data } = await api.get<User>('/auth/me', {
+    const { data } = await api.get<User>('/users/me', {
       headers: {
         Cookie: getCookieHeader(),
       },

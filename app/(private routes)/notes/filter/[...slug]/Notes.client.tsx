@@ -45,21 +45,24 @@ export default function NotesClient({ tag }: NotesClientProps) {
   if (isLoading) return <p>Loading...</p>;
   if (isError || !data) return <p>Error loading notes</p>;
 
+  const hasNotes = data.notes.length > 0;
+  
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
-      <SearchBox value={search} onChange={handleSearchChange} />
+        <SearchBox value={search} onChange={handleSearchChange} />
+        {hasNotes && data.totalPages > 1 && (
           <Pagination
             page={page}
             totalPages={data.totalPages}
             onPageChange={setPage}
           />
+        )}
 
         <Link href="/notes/action/create" className={css.createButton}>Create note +</Link>
-        
       </header>
 
-      {data.notes.length > 0 ? (
+      {hasNotes ? (
           <NoteList
           notes={data.notes}/>
         ) : (
