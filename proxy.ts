@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { parse } from 'cookie';
 import { checkSession } from '@/lib/api/serverApi';
 
 const privateRoutes = ['/profile', '/notes'];
@@ -16,34 +17,50 @@ export async function proxy(request: NextRequest) {
   const isPrivate = privateRoutes.some((route) => pathname.startsWith(route));
   const isAuth = authRoutes.some((route) => pathname.startsWith(route));
  
-  if (!accessToken && refreshToken) {
-    try {
-      const response = await checkSession();
-      const setCookie = response.headers['set-cookie'];
+  if (!accessToken) {
+    if (refreshToken) {
+      
+      const data = await checkSession();
+      const setCookieHeader = data.headers['set-cookie'];
 
-      if (setCookie) {
-        const cookiesArray = Array.isArray(setCookie)
-          ? setCookie
-          : [setCookie];
+      if (setCookieHeader) {
+        const cookieArray = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader];
 
-        cookiesArray.forEach((cookie) => {
-          cookieStore.set(cookie);
-        });
+        for (const cookieStr of cookieArray) {
+          const parsed = parse(cookieStr);
 
-        return NextResponse.next();
+          for (const [name, value] of Object.entries(parsed)) {
+
+            if (value) {
+              cookieStore.set(name, value, { path: '/' });
+            }
+          }
+        }
+
+        if (isAuth) {
+          return NextResponse.redirect(new URL('/', request.url), {
+            headers: {
+              Cookie: cookieStore.toString(),
+            },
+          });
+        }
+        if (isPrivate) {
+          return NextResponse.next({
+            headers: {
+              Cookie: cookieStore.toString(),
+            },
+          });
+        }
       }
-    } catch {
-      cookieStore.delete('accessToken');
-      cookieStore.delete('refreshToken');
     }
+
+    if (isAuth) return NextResponse.next();
+    if (isPrivate) return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 
-  if (!accessToken && isPrivate) {
-    return NextResponse.redirect(new URL('/sign-in', request.url));
-  }
-
-  if (accessToken && isAuth) {
-    return NextResponse.redirect(new URL('/', request.url));
+  if (accessToken) {
+    if (isAuth) return NextResponse.redirect(new URL('/', request.url));
+    if (isPrivate) return NextResponse.next();
   }
 
   return NextResponse.next();
